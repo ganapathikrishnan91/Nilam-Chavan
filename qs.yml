@@ -5,7 +5,6 @@ pool:
   name: 'GANA_AZUREDEVOPS'
 
 variables:
-  - group: qualys-qscanner
   - name: IMAGE_ID
     value: 'myapp:$(Build.BuildId)'
   - name: QSCANNER_OUTPUT_DIR
