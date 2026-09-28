@@ -12,6 +12,8 @@ variables:
     value: '$(Build.ArtifactStagingDirectory)/qualys-reports'
   - name: QSCANNER_SCAN_TIMEOUT
     value: '600'
+  - name: QSCANNER_POLICY_TAG
+    value: 'GANAQSCANNERPOLICY'
 steps:
 - script: |
 pwd
