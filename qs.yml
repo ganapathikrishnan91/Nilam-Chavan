@@ -13,6 +13,15 @@ variables:
   - name: QSCANNER_SCAN_TIMEOUT
     value: '600'
 
+
+variables:
+QUALYS_CLIENT_ID: "dd024dc9-3977-4aa9-bf83-52f27b5b1560"
+QUALYS_CLIENT_SECRET: "BvWmg9uzaSqDChycKI2Me2YhH7mvxMrA"
+QSCANNER_QUALYS_POD: "US1"
+QSCANNER_POLICY_TAGS: "Production"
+QSCANNER_SCAN_TIMEOUT: "1800"
+QSCANNER_OUTPUT_DIR: "/tmp/qualys"
+
 steps:
   - script: docker build -t "$(IMAGE_ID)" .
     displayName: 'Build Image'
