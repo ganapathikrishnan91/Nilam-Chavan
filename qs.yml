@@ -2,7 +2,7 @@ trigger:
   - main
 
 pool:
-  name: 'QScanner-Linux-Agents'
+  name: 'GANA_AZUREDEVOPS'
 
 variables:
   - group: qualys-qscanner
