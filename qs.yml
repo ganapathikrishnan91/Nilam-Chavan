@@ -43,7 +43,7 @@ steps:
   - bash: |
       set -euo pipefail
 
-      if [ ! -x /usr/local/bin/qscanner ]; then
+      if [ ! -x /home/azureuser/qualys/qscanner/data/linux-amd64/qscanner ]; then
         echo "ERROR: QScanner is not installed or executable at /usr/local/bin/qscanner"
         exit 1
       fi
@@ -59,9 +59,9 @@ steps:
       fi
 
       mkdir -p "$QSCANNER_OUTPUT_DIR"
-      /usr/local/bin/qscanner \
+      /home/azureuser/qualys/qscanner/data/linux-amd64/qscanner \
       ./qscanner
-        --pod "$QSCANNER_QUALYS_POD" \
+        --pod "$QSCANNER_QUALYS_POD" qscanner\
         --mode evaluate-policy \
         --policy-tags "$QSCANNER_POLICY_TAGS" \
         --scan-types pkg,fileinsight,aiinsight \
