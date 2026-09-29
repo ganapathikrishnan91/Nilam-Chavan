@@ -7,26 +7,65 @@ pool:
 variables:
   - name: IMAGE_ID
     value: 'myapp:$(Build.BuildId)'
+
   - name: QSCANNER_OUTPUT_DIR
     value: '$(Build.ArtifactStagingDirectory)/qualys-reports'
+
   - name: QSCANNER_SCAN_TIMEOUT
-    value: '600'
+    value: '10m'
+
+  - name: QSCANNER_QUALYS_POD
+    value: 'US1'
+
+  - name: QSCANNER_POLICY_TAGS
+    value: 'Production'
+	
   - name: QUALYS_CLIENT_ID
     value: "dd024dc9-3977-4aa9-bf83-52f27b5b1560"
+  
   - name: QUALYS_CLIENT_SECRET
     value: "BvWmg9uzaSqDChycKI2Me2YhH7mvxMrA"
-  - name: QSCANNER_QUALYS_POD
-    value: US1
-  - name: QSCANNER_POLICY_TAGS
-    value:  "Production"
 
 steps:
-  - script: docker build -t "$(IMAGE_ID)" .
-    displayName: 'Build Image'
+  - bash: |
+      set -euo pipefail
+
+      mkdir -p "$(QSCANNER_OUTPUT_DIR)"
+
+      cat > Dockerfile <<'EOF'
+      FROM alpine:3.19
+      RUN apk add --no-cache curl
+      CMD ["sh", "-c", "echo Hello from QScanner test image"]
+      EOF
+    displayName: 'Prepare Test Files'
 
   - bash: |
       set -euo pipefail
+      docker build -t "$IMAGE_ID" .
+    displayName: 'Build Image'
+    env:
+      IMAGE_ID: $(IMAGE_ID)
+
+  - bash: |
+      set -euo pipefail
+
+      if [ ! -x /usr/local/bin/qscanner ]; then
+        echo "ERROR: QScanner is not installed or executable at /usr/local/bin/qscanner"
+        exit 1
+      fi
+
+      if [ -z "${QUALYS_CLIENT_ID:-}" ]; then
+        echo "ERROR: QUALYS_CLIENT_ID is not configured"
+        exit 1
+      fi
+
+      if [ -z "${QUALYS_CLIENT_SECRET:-}" ]; then
+        echo "ERROR: QUALYS_CLIENT_SECRET is not configured"
+        exit 1
+      fi
+
       mkdir -p "$QSCANNER_OUTPUT_DIR"
+
       /usr/local/bin/qscanner \
         --pod "$QSCANNER_QUALYS_POD" \
         --mode evaluate-policy \
