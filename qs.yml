@@ -59,7 +59,7 @@ steps:
       fi
 
       mkdir -p "$QSCANNER_OUTPUT_DIR"
-      /home/azureuser/qualys/qscanner/data/linux-amd64 
+      /usr/local/bin/qscanner \
       ./qscanner
         --pod "$QSCANNER_QUALYS_POD" \
         --mode evaluate-policy \
