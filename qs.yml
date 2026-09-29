@@ -18,7 +18,7 @@ variables:
     value: 'US1'
 
   - name: QSCANNER_POLICY_TAGS
-    value: 'Production'
+    value: 'GANAQSCANNERPOLICY'
 	
   - name: QUALYS_CLIENT_ID
     value: "dd024dc9-3977-4aa9-bf83-52f27b5b1560"
