@@ -7,22 +7,16 @@ pool:
 variables:
   - name: IMAGE_ID
     value: 'myapp:$(Build.BuildId)'
-
   - name: QSCANNER_OUTPUT_DIR
     value: '$(Build.ArtifactStagingDirectory)/qualys-reports'
-
   - name: QSCANNER_SCAN_TIMEOUT
     value: '10m'
-
   - name: QSCANNER_QUALYS_POD
     value: 'US1'
-
   - name: QSCANNER_POLICY_TAGS
     value: 'GANAQSCANNERPOLICY'
-	
   - name: QUALYS_CLIENT_ID
     value: "dd024dc9-3977-4aa9-bf83-52f27b5b1560"
-  
   - name: QUALYS_CLIENT_SECRET
     value: "BvWmg9uzaSqDChycKI2Me2YhH7mvxMrA"
 
