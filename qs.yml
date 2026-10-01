@@ -1,9 +1,9 @@
 trigger:
   - main
-
+ 
 pool:
   name: 'GANA_AZUREDEVOPS'
-
+ 
 variables:
   - name: IMAGE_ID
     value: 'myapp:$(Build.BuildId)'
@@ -19,55 +19,59 @@ variables:
     value: "dd024dc9-3977-4aa9-bf83-52f27b5b1560"
   - name: QUALYS_CLIENT_SECRET
     value: "BvWmg9uzaSqDChycKI2Me2YhH7mvxMrA"
-
+ 
 steps:
   - bash: |
       set -euo pipefail
-
+ 
       mkdir -p "$(QSCANNER_OUTPUT_DIR)"
-
+ 
       cat > Dockerfile <<'EOF'
       FROM alpine:3.19
       RUN apk add --no-cache curl
       CMD ["sh", "-c", "echo Hello from QScanner test image"]
       EOF
     displayName: 'Prepare Test Files'
-
+ 
   - bash: |
       set -euo pipefail
       docker build -t "$IMAGE_ID" .
     displayName: 'Build Image'
     env:
       IMAGE_ID: $(IMAGE_ID)
-
+ 
   - bash: |
       set -euo pipefail
-
+ 
       if [ ! -x /home/azureuser/qualys/qscanner/data/linux-amd64/qscanner ]; then
         echo "ERROR: QScanner is not installed or executable at /home/azureuser/qualys/qscanner/data/linux-amd64/qscanner"
         exit 1
       fi
-
+ 
       if [ -z "${QUALYS_CLIENT_ID:-}" ]; then
         echo "ERROR: QUALYS_CLIENT_ID is not configured"
         exit 1
       fi
-
+ 
       if [ -z "${QUALYS_CLIENT_SECRET:-}" ]; then
         echo "ERROR: QUALYS_CLIENT_SECRET is not configured"
         exit 1
       fi
-
+ 
       mkdir -p "$QSCANNER_OUTPUT_DIR"
       cd /home/azureuser/qualys/qscanner/data/linux-amd64
-      ./qscanner
-        --pod "$QSCANNER_QUALYS_POD" \
-        --mode evaluate-policy \
-        --policy-tags "$QSCANNER_POLICY_TAGS" \
-        --scan-types pkg,fileinsight,aiinsight \
-        --scan-timeout "$QSCANNER_SCAN_TIMEOUT" \
-        --output-dir "$QSCANNER_OUTPUT_DIR" \
+ 
+      qscanner_args=(
+        --pod "$QSCANNER_QUALYS_POD"
+        --mode evaluate-policy
+        --policy-tags "$QSCANNER_POLICY_TAGS"
+        --scan-types pkg,fileinsight,aiinsight
+        --scan-timeout "$QSCANNER_SCAN_TIMEOUT"
+        --output-dir "$QSCANNER_OUTPUT_DIR"
         image "$IMAGE_ID"
+      )
+ 
+      ./qscanner "${qscanner_args[@]}"
     displayName: 'Qualys Policy Gate'
     env:
       QUALYS_CLIENT_ID: $(QUALYS_CLIENT_ID)
@@ -77,7 +81,7 @@ steps:
       QSCANNER_SCAN_TIMEOUT: $(QSCANNER_SCAN_TIMEOUT)
       QSCANNER_OUTPUT_DIR: $(QSCANNER_OUTPUT_DIR)
       IMAGE_ID: $(IMAGE_ID)
-
+ 
   - task: PublishPipelineArtifact@1
     displayName: 'Publish Qualys Reports'
     condition: always()
